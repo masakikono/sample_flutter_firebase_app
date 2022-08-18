@@ -31,7 +31,6 @@ Future<void> main() async {
   }
 }
 
-
 class MyApp extends StatefulWidget {
   const MyApp() : super();
 
@@ -43,6 +42,7 @@ class _MyHomePageState extends State<MyApp> {
   void initState() {
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -51,15 +51,24 @@ class _MyHomePageState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(),
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(builder: (_) => DefaultPage());
-        }
-      }
-    );
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(),
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/':
+              return MaterialPageRoute(builder: (_) => DefaultPage());
+            case '/top':
+              return MaterialPageRoute(builder: (_) => TopPage());
+            case '/memo_list':
+              return MaterialPageRoute(builder: (_) => MemoListPage());
+            case '/memo_detail':
+              return MaterialPageRoute(builder: (_) => MemoDetailPage());
+            case '/memo_register':
+              return MaterialPageRoute(builder: (_) => MemoRegisterPage());
+            case '/memo_update':
+              return MaterialPageRoute(builder: (_) => MemoUpdatePage());
+          }
+        });
   }
 }
