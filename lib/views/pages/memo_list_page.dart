@@ -13,18 +13,19 @@ class MemoListPage extends StatefulWidget {
 }
 
 class _MemoListPageState extends State<MemoListPage> {
-  
+
   List displayMemoList = [];
-  
+
   @override
   void initState() {
     super.initState();
     _load();
   }
-  
+
   Widget build(BuildContext context) {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar(reason: SnackBarClosedReason.action);
+      ScaffoldMessenger.of(context).removeCurrentSnackBar(
+          reason: SnackBarClosedReason.action);
     });
     return Scaffold(
       appBar: AppBar(
@@ -41,21 +42,62 @@ class _MemoListPageState extends State<MemoListPage> {
       ),
       body: Column(
         children: <Widget>[
-          ((){
-            if(displayMemoList.isNotEmpty) {
+          (() {
+            if (displayMemoList.isNotEmpty) {
               return Expanded(
-                  child: Scrollbar(
-                    isAlwaysShown: true,
-                    child:  SingleChildScrollView(
-                      child:  SizedBox(
-                        child: ListView.builder(itemBuilder: itemBuilder),
+                child: Scrollbar(
+                  isAlwaysShown: true,
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: displayMemoList.length,
+                          itemBuilder: (context, index) {
+                            var memo = displayMemoList[index];
+                            return Container(
+                              child: ListTile(
+                                title: Text(
+                                  memo['memo'],
+                                ),
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/memo_detail', arguments: {
+                                    'doc_id': memo['doc_id'],
+                                  });
+                                },
+                              ),
+                            )
+                          }
                       ),
                     ),
-                  ))
+                  ),
+                ),
+              );
+            } else {
+              return const Center(child: Text('メモはありません'))；
             }
-          })
+          }) (),
         ],
       ),
     );
+  }
+
+  void _load() {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    var uid = firebaseAuth.currentUser?.uid;
+    DBMemo dbMemo = DBMemo();
+    var memoList = await dbMemo.getList(uid);
+    WidgetsBinding.instance?.addPersistentFrameCallback((_) {
+      setState((){
+        for (final memo in memoList) {
+          var memoData = memo.data();
+          displayMemoList.add({
+            'doc_id' : memo.id,
+            'memo' : memomData['memo'],
+          });
+        }
+      });
+    });
   }
 }
